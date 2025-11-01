@@ -32,24 +32,22 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
     import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
 
-   
- const firebaseConfig = {
-  apiKey: "AIzaSyBKJGXExfnqwsprIgdYzoTPLiGEMPQPGNg",
-  authDomain: "carsellapp-d3b2f.firebaseapp.com",
-  projectId: "carsellapp-d3b2f",
-  storageBucket: "carsellapp-d3b2f.firebasestorage.app",
-  messagingSenderId: "83529395692",
-  appId: "1:83529395692:web:4171b771dd9fb706a2e4c9",
-  measurementId: "G-M4X20F8SEE"
-};
-
-    // ------------------------------------------
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKJGXExfnqwsprIgdYzoTPLiGEMPQPGNg",
+      authDomain: "carsellapp-d3b2f.firebaseapp.com",
+      projectId: "carsellapp-d3b2f",
+      storageBucket: "carsellapp-d3b2f.appspot.com",
+      messagingSenderId: "83529395692",
+      appId: "1:83529395692:web:4171b771dd9fb706a2e4c9",
+      measurementId: "G-M4X20F8SEE"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     const params = new URLSearchParams(window.location.search);
-    const mode = params.get('mode'); // doit être "resetPassword"
+    const mode = params.get('mode');
     const oobCode = params.get('oobCode');
 
     const info = document.getElementById('info');
@@ -67,7 +65,6 @@
     if (mode !== 'resetPassword' || !oobCode) {
       info.textContent = "Lien invalide ou incomplet.";
     } else {
-      // Vérifier le code avant d'afficher le formulaire
       verifyPasswordResetCode(auth, oobCode)
         .then(email => {
           info.innerHTML = "Lien valide pour l'adresse : <strong>" + email + "</strong>";
@@ -91,8 +88,6 @@
       try {
         await confirmPasswordReset(auth, oobCode, newPassword);
         showMessage("Mot de passe modifié avec succès. Vous pouvez maintenant vous connecter.");
-        // Optionnel : rediriger vers l'app / page de login
-        // setTimeout(() => window.location.href = "/login", 2500);
       } catch (err) {
         console.error("confirm error:", err);
         showMessage(err.message || "Échec de la réinitialisation.", true);
