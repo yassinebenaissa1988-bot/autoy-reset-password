@@ -1,17 +1,45 @@
 <!doctype html>
-<html>
+<html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Réinitialiser le mot de passe</title>
   <style>
-    body { font-family: -apple-system, Roboto, Arial; padding: 24px; background:#f5f6f8; }
-    .card { max-width:420px; margin:40px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.08); }
-    input { width:100%; padding:12px; margin-top:8px; margin-bottom:12px; border-radius:8px; border:1px solid #ddd; }
-    button { padding:12px 18px; width:100%; border:none; background:#1775f1; color:white; border-radius:8px; font-weight:600; }
-    .msg { padding:10px; margin-top:8px; border-radius:8px; }
-    .error { background:#fee; color:#900; border:1px solid #fbb; }
-    .success { background:#efe; color:#060; border:1px solid #bfb; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, Roboto, Arial;
+      background: #f5f6f8;
+      margin: 0;
+      padding: 40px;
+    }
+    .card {
+      max-width: 420px;
+      margin: auto;
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 15px;
+    }
+    button {
+      background: #1775f1;
+      color: white;
+      border: none;
+      font-weight: 600;
+    }
+    .msg {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .error { background: #fee; color: #900; }
+    .success { background: #efe; color: #060; }
   </style>
 </head>
 <body>
@@ -19,20 +47,19 @@
     <h2>Réinitialiser le mot de passe</h2>
     <div id="info">Vérification du lien...</div>
 
-    <div id="resetForm" style="display:none;">
-      <label>Nouveau mot de passe</label>
-      <input id="newPassword" type="password" placeholder="Entrez un nouveau mot de passe (>= 6 caractères)" />
-      <button id="submitBtn">Envoyer</button>
-      <div id="message" class="msg" style="display:none;"></div>
+    <div id="form" style="display:none;">
+      <input id="newPass" type="password" placeholder="Nouveau mot de passe (≥ 6 caractères)">
+      <button id="btn">Valider</button>
+      <div id="msg" class="msg" style="display:none;"></div>
     </div>
   </div>
 
-  <!-- Firebase v9 (modulaire) CDN -->
+  <!-- Firebase SDK -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-    import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-  
+    // ✅ Ta config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBKJGXExfnqwsprIgdYzoTPLiGEMPQPGNg",
       authDomain: "carsellapp-d3b2f.firebaseapp.com",
@@ -46,53 +73,48 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    const info = document.getElementById("info");
+    const form = document.getElementById("form");
+    const btn = document.getElementById("btn");
+    const msg = document.getElementById("msg");
+
     const params = new URLSearchParams(window.location.search);
-    const mode = params.get('mode');
-    const oobCode = params.get('oobCode');
+    const mode = params.get("mode");
+    const code = params.get("oobCode");
 
-    const info = document.getElementById('info');
-    const resetForm = document.getElementById('resetForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const newPasswordInput = document.getElementById('newPassword');
-    const message = document.getElementById('message');
-
-    function showMessage(text, isError=false) {
-      message.style.display = 'block';
-      message.className = isError ? 'msg error' : 'msg success';
-      message.textContent = text;
+    function showMessage(text, error=false) {
+      msg.style.display = "block";
+      msg.textContent = text;
+      msg.className = error ? "msg error" : "msg success";
     }
 
-    if (mode !== 'resetPassword' || !oobCode) {
+    if (mode !== "resetPassword" || !code) {
       info.textContent = "Lien invalide ou incomplet.";
     } else {
-      verifyPasswordResetCode(auth, oobCode)
+      verifyPasswordResetCode(auth, code)
         .then(email => {
-          info.innerHTML = "Lien valide pour l'adresse : <strong>" + email + "</strong>";
-          resetForm.style.display = 'block';
+          info.innerHTML = "Lien valide pour <strong>" + email + "</strong>";
+          form.style.display = "block";
         })
-        .catch(error => {
-          console.error("verify error:", error);
-          info.textContent = "Ce lien est invalide ou expiré.";
-          showMessage(error.message || "Erreur lors de la vérification du lien.", true);
+        .catch(err => {
+          console.error(err);
+          info.textContent = "Lien invalide ou expiré.";
         });
     }
 
-    submitBtn.addEventListener('click', async () => {
-      const newPassword = newPasswordInput.value.trim();
-      message.style.display = 'none';
-      if (newPassword.length < 6) {
-        showMessage('Le mot de passe doit contenir au moins 6 caractères.', true);
-        return;
-      }
-      submitBtn.disabled = true;
+    btn.addEventListener("click", async () => {
+      const newPass = document.getElementById("newPass").value.trim();
+      if (newPass.length < 6) return showMessage("Le mot de passe doit contenir au moins 6 caractères.", true);
+
+      btn.disabled = true;
       try {
-        await confirmPasswordReset(auth, oobCode, newPassword);
-        showMessage("Mot de passe modifié avec succès. Vous pouvez maintenant vous connecter.");
+        await confirmPasswordReset(auth, code, newPass);
+        showMessage(" Mot de passe réinitialisé avec succès !");
       } catch (err) {
-        console.error("confirm error:", err);
-        showMessage(err.message || "Échec de la réinitialisation.", true);
+        console.error(err);
+        showMessage("Erreur : " + err.message, true);
       } finally {
-        submitBtn.disabled = false;
+        btn.disabled = false;
       }
     });
   </script>
