@@ -60,7 +60,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-    // --- 🌍 Textes multilingues ---
+    // ---  Textes multilingues ---
     const translations = {
       fr: {
         title: "Réinitialiser le mot de passe",
@@ -100,7 +100,7 @@
       }
     };
 
-    // --- 🌐 Détection de la langue du lien ---
+    // ---  Détection de la langue du lien ---
     const params = new URLSearchParams(window.location.search);
     const lang = params.get("lang") || "fr";
     const t = translations[lang] || translations.fr;
@@ -111,7 +111,7 @@
       document.body.style.textAlign = "right";
     }
 
-    // --- 📝 Appliquer les textes selon la langue ---
+    // ---  Appliquer les textes selon la langue ---
     document.title = t.title;
     document.getElementById("title").textContent = t.title;
     document.getElementById("header").textContent = t.title;
@@ -119,7 +119,7 @@
     document.getElementById("newPass").placeholder = t.placeholder;
     document.getElementById("btn").textContent = t.validate;
 
-    // --- 🔥 Config Firebase ---
+    // ---  Config Firebase ---
     const firebaseConfig = {
       apiKey: "AIzaSyBKJGXExfnqwsprIgdYzoTPLiGEMPQPGNg",
       authDomain: "carsellapp-d3b2f.firebaseapp.com",
